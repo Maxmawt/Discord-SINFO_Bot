@@ -36,7 +36,7 @@ def init(client):
                     for member in m.mentions:
                         await client.unban(m.server, member)
                         await client.send_message(m.channel, "unbanned {}".format(member.name))
-                t = AsyncTimer(unban_time * 86400, unban_all)
+                AsyncTimer(unban_time * 86400, unban_all)
         else:
             await client.say("You do not have the permission to ban users")
 
@@ -91,7 +91,29 @@ def init(client):
             if message.find(" ") > 0:
                 name = message[message.find(" ") + 1:]
                 await create_course(name, client, m.server)
+                await client.say("Create channel and role {}".format(name))
             else:
                 await client.say("Please provide a name")
         else:
             await client.say("You don't have the permissions to use this command.")
+
+    @client.command(pass_context=True)
+    async def follow_course(context):
+        m = context.message
+        u = m.author
+
+        message = m.content
+        if message.find(" ") > 0:
+            name = message[message.find(" ") + 1:]
+            role = discord.utils.get(m.server.roles, name=name)
+            if role:
+                annonceur = discord.utils.get(m.server.roles, name="Annonceur")
+                if role >= annonceur:
+                    await client.say("You cannot request that role!")
+                else:
+                    await client.add_roles(u, role)
+                    await client.say("{} now has access to {}".format(u.name, name))
+            else:
+                await client.say("Please give the name of an existing course")
+        else:
+            await client.say("Please provide a course to follow")
