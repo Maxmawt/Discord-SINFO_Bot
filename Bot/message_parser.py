@@ -29,13 +29,13 @@ def init(client):
         if m.author.server_permissions.ban_members:
             for member in m.mentions:
                 await client.ban(member, delete_message_days=0)
-                await client.say("banned {} for {} days (-1 = indefinite)".format(member.name, unban_time))
+                await client.say("banned {} for {} days (-1 = indefinite)".format(member.nick, unban_time))
 
             if unban_time >= 0:
                 async def unban_all():
                     for member in m.mentions:
                         await client.unban(m.server, member)
-                        await client.send_message(m.channel, "unbanned {}".format(member.name))
+                        await client.send_message(m.channel, "unbanned {}".format(member.nick))
                 AsyncTimer(unban_time * 86400, unban_all)
         else:
             await client.say("You do not have the permission to ban users")
@@ -47,7 +47,7 @@ def init(client):
         if m.author.server_permissions.kick_members:
             for member in m.mentions:
                 await client.kick(member)
-                await client.say("kicked {}".format(member.name))
+                await client.say("kicked {}".format(member.nick))
         else:
             await client.say("You do not have the permission to kick users")
 
@@ -68,12 +68,12 @@ def init(client):
         if m.author.server_permissions.manage_roles and mute_time >= 0:
             for member in m.mentions:
                 await client.add_roles(member, muted)
-                await client.say("Muted {} for {} minutes".format(member.name, int(mute_time)))
+                await client.say("Muted {} for {} minutes".format(member.nick, int(mute_time)))
             if mute_time >= 0:
                 async def unban_all():
                     for member in m.mentions:
                         await client.remove_roles(member, muted)
-                        await client.send_message(m.channel, "Unmuted {}".format(member.name))
+                        await client.send_message(m.channel, "Unmuted {}".format(member.nick))
 
                 AsyncTimer(mute_time * 60, unban_all)
         elif mute_time == -1:
@@ -116,7 +116,7 @@ def init(client):
                     await client.say("You cannot request that role!")
                 else:
                     await client.add_roles(u, role)
-                    await client.say("{} now has access to {}".format(u.name, name))
+                    await client.say("{} now has access to {}".format(u.nick, name))
             else:
                 await client.say("Please give the name of an existing course")
         else:
@@ -137,7 +137,7 @@ def init(client):
                     await client.say("You cannot request that role!")
                 else:
                     await client.remove_roles(u, role)
-                    await client.say("{} now no longer has access to {}".format(u.name, name))
+                    await client.say("{} now no longer has access to {}".format(u.nick, name))
             else:
                 await client.say("Please give the name of an existing course")
         else:
