@@ -4,6 +4,7 @@
 
 import discord
 
+from course_handler import create_course
 from discord_utils import AsyncTimer
 
 commands = ['yo bot', 'yea bot', 'yea boi']
@@ -37,7 +38,7 @@ def init(client):
                         await client.send_message(m.channel, "unbanned {}".format(member.name))
                 t = AsyncTimer(unban_time * 86400, unban_all)
         else:
-            await client.say("you do not have the permission to ban users")
+            await client.say("You do not have the permission to ban users")
 
     @client.command(pass_context=True)
     async def kick(context):
@@ -48,7 +49,7 @@ def init(client):
                 await client.kick(member)
                 await client.say("kicked {}".format(member.name))
         else:
-            await client.say("you do not have the permission to kick users")
+            await client.say("You do not have the permission to kick users")
 
     @client.command(aliases=['mute', 'silence'], pass_context=True)
     async def timeout(context):
@@ -78,4 +79,19 @@ def init(client):
         elif mute_time == -1:
             await client.say("Please provide a time (in minutes)")
         else:
-            await client.say("you do not have the permission to ban users")
+            await client.say("You do not have the permission to ban users")
+
+    @client.command(pass_context=True)
+    async def add_course(context):
+        """Creates a channel and role for a course."""
+        m = context.message
+        u = m.author
+        if u.server_permissions.manage_channels:
+            message = m.content
+            if message.find(" ") > 0:
+                name = message[message.find(" ") + 1:]
+                await create_course(name, client, m.server)
+            else:
+                await client.say("Please provide a name")
+        else:
+            await client.say("You don't have the permissions to use this command.")
