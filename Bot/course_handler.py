@@ -6,7 +6,7 @@ import discord
 async def create_course(name, client, server):
     """Takes a name, bot and server and creates a role and channel of that name on the server. The role has permission
     to read on the channel."""
-    role = await client.create_role(server, name=name)
+    role = await client.create_role(server, name=name.upper())
 
     block_perms = discord.PermissionOverwrite(read_messages=False)
     read_perms = discord.PermissionOverwrite(read_messages=True)

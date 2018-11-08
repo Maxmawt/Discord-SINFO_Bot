@@ -105,7 +105,7 @@ def init(client):
         message = m.content
         if message.find(" ") > 0:
             name = message[message.find(" ") + 1:]
-            role = discord.utils.get(m.server.roles, name=name)
+            role = discord.utils.get(m.server.roles, name=name.upper())
             if role:
                 annonceur = discord.utils.get(m.server.roles, name="Annonceur")
                 if role >= annonceur:
