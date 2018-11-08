@@ -95,7 +95,7 @@ def init(client):
                     await client.say("Course exists!")
                 else:
                     await create_course(name, client, m.server)
-                    await client.say("Create channel and role {}".format(name))
+                    await client.say("Created channel and role {}".format(name))
             else:
                 await client.say("Please provide a name")
         else:
