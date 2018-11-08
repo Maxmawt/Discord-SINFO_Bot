@@ -81,7 +81,7 @@ def init(client):
         else:
             await client.say("You do not have the permission to ban users")
 
-    @client.command(pass_context=True)
+    @client.command(aliases=['ac'], pass_context=True)
     async def add_course(context):
         """Creates a channel and role for a course."""
         m = context.message
@@ -90,14 +90,18 @@ def init(client):
             message = m.content
             if message.find(" ") > 0:
                 name = message[message.find(" ") + 1:]
-                await create_course(name, client, m.server)
-                await client.say("Create channel and role {}".format(name))
+                role = discord.utils.get(m.server.roles, name=name.upper())
+                if role:
+                    await client.say("Course exists!")
+                else:
+                    await create_course(name, client, m.server)
+                    await client.say("Create channel and role {}".format(name))
             else:
                 await client.say("Please provide a name")
         else:
             await client.say("You don't have the permissions to use this command.")
 
-    @client.command(pass_context=True)
+    @client.command(aliases=['follow'], pass_context=True)
     async def follow_course(context):
         m = context.message
         u = m.author
@@ -113,6 +117,27 @@ def init(client):
                 else:
                     await client.add_roles(u, role)
                     await client.say("{} now has access to {}".format(u.name, name))
+            else:
+                await client.say("Please give the name of an existing course")
+        else:
+            await client.say("Please provide a course to follow")
+
+    @client.command(aliases=['unfollow'], pass_context=True)
+    async def unfollow_course(context):
+        m = context.message
+        u = m.author
+
+        message = m.content
+        if message.find(" ") > 0:
+            name = message[message.find(" ") + 1:]
+            role = discord.utils.get(m.server.roles, name=name.upper())
+            if role:
+                annonceur = discord.utils.get(m.server.roles, name="Annonceur")
+                if role >= annonceur:
+                    await client.say("You cannot request that role!")
+                else:
+                    await client.remove_roles(u, role)
+                    await client.say("{} now no longer has access to {}".format(u.name, name))
             else:
                 await client.say("Please give the name of an existing course")
         else:
