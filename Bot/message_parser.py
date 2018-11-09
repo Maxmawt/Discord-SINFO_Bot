@@ -112,7 +112,6 @@ def init(client):
             refused = ""
             for name in message.split(" ")[1:]:
                 role = discord.utils.get(m.server.roles, name=name.upper())
-                print(role, name)
                 if role:
                     annonceur = discord.utils.get(m.server.roles, name="Annonceur")
                     if role >= annonceur:
