@@ -81,19 +81,19 @@ def init(client):
 
     @client.command(aliases=['ac'], pass_context=True)
     async def add_course(context):
-        """Creates a channel and role for a course."""
+        """Creates a channel and role for a list of courses."""
         m = context.message
         u = m.author
         if u.server_permissions.manage_channels:
             message = m.content
             if message.find(" ") > 0:
-                name = message[message.find(" ") + 1:]
-                role = discord.utils.get(m.server.roles, name=name.upper())
-                if role:
-                    await client.say("Course exists!")
-                else:
-                    await create_course(name, client, m.server)
-                    await client.say("Created channel and role {}".format(name))
+                for name in message.split(" ")[1:]:
+                    role = discord.utils.get(m.server.roles, name=name.upper())
+                    if role:
+                        await client.say("Course exists!")
+                    else:
+                        await create_course(name, client, m.server)
+                        await client.say("Created channel and role {}".format(name))
             else:
                 await client.say("Please provide a name")
         else:
@@ -101,48 +101,66 @@ def init(client):
 
     @client.command(aliases=['follow'], pass_context=True)
     async def follow_course(context):
+        """Allows an user to follow a list of courses."""
         m = context.message
         u = m.author
 
         message = m.content
         if message.find(" ") > 0:
-            name = message[message.find(" ") + 1:]
-            role = discord.utils.get(m.server.roles, name=name.upper())
-            if role:
-                annonceur = discord.utils.get(m.server.roles, name="Annonceur")
-                if role >= annonceur:
-                    await client.say("You cannot request that role!")
+            success = ""
+            fail = ""
+            refused = ""
+            for name in message.split(" ")[1:]:
+                role = discord.utils.get(m.server.roles, name=name.upper())
+                print(role, name)
+                if role:
+                    annonceur = discord.utils.get(m.server.roles, name="Annonceur")
+                    if role >= annonceur:
+                        refused += name + " "
+                    else:
+                        await client.add_roles(u, role)
+                        success += name + " "
                 else:
-                    await client.add_roles(u, role)
-                    await client.say("{} now has access to {}".format(u.nick, name))
-            else:
-                await client.say("Please give the name of an existing course")
+                    fail += name + " "
+            full = "You successfully followed: " + success.strip() + "\n" if success else ""
+            full += "Couldn't follow: " + refused.strip() + "\n" if refused else ""
+            full += "Couldn't find: " + fail.strip() if fail else ""
+            await client.send_message(u, full.strip())
         else:
             await client.say("Please provide a course to follow")
 
     @client.command(aliases=['unfollow'], pass_context=True)
     async def unfollow_course(context):
+        """Allows an user to unfollow a list of courses."""
         m = context.message
         u = m.author
 
         message = m.content
         if message.find(" ") > 0:
-            name = message[message.find(" ") + 1:]
-            role = discord.utils.get(m.server.roles, name=name.upper())
-            if role:
-                annonceur = discord.utils.get(m.server.roles, name="Annonceur")
-                if role >= annonceur:
-                    await client.say("You cannot request that role!")
+            success = ""
+            fail = ""
+            refused = ""
+            for name in message.split(" ")[1:]:
+                role = discord.utils.get(m.server.roles, name=name.upper())
+                if role:
+                    annonceur = discord.utils.get(m.server.roles, name="Annonceur")
+                    if role >= annonceur or role not in u.roles:
+                        refused += name + " "
+                    else:
+                        await client.remove_roles(u, role)
+                        success += name + " "
                 else:
-                    await client.remove_roles(u, role)
-                    await client.say("{} now no longer has access to {}".format(u.nick, name))
-            else:
-                await client.say("Please give the name of an existing course")
+                    fail += name + " "
+            full = "You successfully unfollowed: " + success.strip() + "\n" if success else ""
+            full += "Couldn't unfollow: " + refused.strip() + "\n" if refused else ""
+            full += "Couldn't find: " + fail.strip() if fail else ""
+            await client.send_message(u, full.strip())
         else:
             await client.say("Please provide a course to follow")
 
     @client.command(aliases=['list'], pass_context=True)
     async def list_courses(context):
+        """Lists all available courses in the server."""
         courses = get_courses(context.message.server)
 
         s = "| "
