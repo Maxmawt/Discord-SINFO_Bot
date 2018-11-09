@@ -88,7 +88,7 @@ def init(client):
             message = m.content
             if message.find(" ") > 0:
                 name = message[message.find(" ") + 1:]
-                role = discord.get(m.server.roles, name=name.upper())
+                role = discord.utils.get(m.server.roles, name=name.upper())
                 if role:
                     await client.say("Course exists!")
                 else:
