@@ -14,3 +14,14 @@ async def create_course(name, client, server):
     channel = await client.create_channel(server, name, (server.default_role, block_perms), (role, read_perms))
 
     return channel, role
+
+
+def get_courses(server):
+    annonceur = discord.utils.get(server.roles, name="Annonceur")
+    courses = []
+
+    for course in server.roles:
+        if course < annonceur and course != server.default_role:
+            courses.append(course.name)
+
+    return sorted(courses)

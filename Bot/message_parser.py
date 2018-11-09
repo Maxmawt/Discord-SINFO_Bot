@@ -4,15 +4,13 @@
 
 import discord
 
-from course_handler import create_course
+from course_handler import create_course, get_courses
 from discord_utils import AsyncTimer
 
 commands = ['yo bot', 'yea bot', 'yea boi']
 
 
 def init(client):
-    client = client
-
     @client.command(pass_context=True)
     async def ban(context):
         """Takes a list of mentioned users + optionally an int. Bans all users in list, and if int has been supplied,
@@ -90,7 +88,7 @@ def init(client):
             message = m.content
             if message.find(" ") > 0:
                 name = message[message.find(" ") + 1:]
-                role = discord.utils.get(m.server.roles, name=name.upper())
+                role = discord.get(m.server.roles, name=name.upper())
                 if role:
                     await client.say("Course exists!")
                 else:
@@ -142,3 +140,12 @@ def init(client):
                 await client.say("Please give the name of an existing course")
         else:
             await client.say("Please provide a course to follow")
+
+    @client.command(aliases=['list'], pass_context=True)
+    async def list_courses(context):
+        courses = get_courses(context.message.server)
+
+        s = "| "
+        for course in courses:
+            s += course + " | "
+        await client.say(s.strip())
