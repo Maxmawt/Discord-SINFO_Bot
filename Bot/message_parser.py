@@ -79,7 +79,7 @@ def init(client):
         else:
             await client.say("You do not have the permission to ban users")
 
-    @client.command(aliases=['ac'], pass_context=True)
+    @client.command(aliases=['add','ac'], pass_context=True)
     async def add_course(context):
         """Creates a channel and role for a list of courses."""
         m = context.message
@@ -99,7 +99,7 @@ def init(client):
         else:
             await client.say("You don't have the permissions to use this command.")
 
-    @client.command(aliases=['follow'], pass_context=True)
+    @client.command(aliases=['follow', 'fc'], pass_context=True)
     async def follow_course(context):
         """Allows an user to follow a list of courses."""
         m = context.message
@@ -128,7 +128,7 @@ def init(client):
         else:
             await client.say("Please provide a course to follow")
 
-    @client.command(aliases=['unfollow'], pass_context=True)
+    @client.command(aliases=['unfollow', 'uc'], pass_context=True)
     async def unfollow_course(context):
         """Allows an user to unfollow a list of courses."""
         m = context.message
@@ -157,7 +157,7 @@ def init(client):
         else:
             await client.say("Please provide a course to follow")
 
-    @client.command(aliases=['list'], pass_context=True)
+    @client.command(aliases=['list', 'lc'], pass_context=True)
     async def list_courses(context):
         """Lists all available courses in the server."""
         courses = get_courses(context.message.server)
