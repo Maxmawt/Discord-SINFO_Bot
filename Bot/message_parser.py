@@ -107,31 +107,25 @@ def init(client):
 
         message = m.content
         if message.find(" ") > 0:
+            roles = []
             success = ""
             fail = ""
             refused = ""
-            print(u)
             for name in message.split(" ")[1:]:
                 role = discord.utils.get(m.server.roles, name=name.upper())
-                print(role)
                 if role:
                     annonceur = discord.utils.get(m.server.roles, name="Annonceur")
-                    print(annonceur)
                     if role >= annonceur or role in u.roles:
-                        print("illegal")
                         refused += name + " "
                     else:
-                        await client.add_roles(u, role)
-                        print("success")
+                        roles.append(role)
                         success += name + " "
                 else:
-                    print("rip")
                     fail += name + " "
             full = "You successfully followed: " + success.strip() + "\n" if success else ""
             full += "Couldn't follow: " + refused.strip() + "\n" if refused else ""
             full += "Couldn't find: " + fail.strip() if fail else ""
-            print(full)
-            print()
+            await client.add_roles(u, *roles)
             await client.send_message(u, full.strip())
         else:
             await client.say("Please provide a course to follow")
@@ -144,31 +138,25 @@ def init(client):
 
         message = m.content
         if message.find(" ") > 0:
-            print(u)
+            roles = []
             success = ""
             fail = ""
             refused = ""
             for name in message.split(" ")[1:]:
                 role = discord.utils.get(m.server.roles, name=name.upper())
-                print(role)
                 if role:
                     annonceur = discord.utils.get(m.server.roles, name="Annonceur")
-                    print(annonceur)
                     if role >= annonceur or role not in u.roles:
-                        print("illegal")
                         refused += name + " "
                     else:
-                        await client.remove_roles(u, role)
-                        print("success")
+                        roles.append(role)
                         success += name + " "
                 else:
-                    print("rip")
                     fail += name + " "
             full = "You successfully unfollowed: " + success.strip() + "\n" if success else ""
             full += "Couldn't unfollow: " + refused.strip() + "\n" if refused else ""
             full += "Couldn't find: " + fail.strip() if fail else ""
-            print(full)
-            print()
+            await client.remove_roles(u, *roles)
             await client.send_message(u, full.strip())
         else:
             await client.say("Please provide a course to follow")
