@@ -20,9 +20,9 @@ def runbot(token):
         server = member.server
         welcome = discord.utils.get(server.channels, name="welcome")
         client.send_message(welcome, "Bonjour {} et bienvenue dans le serveur SINFO! Indique ton nom et ta section "
-                                     "d'études (p.ex. 'Ingo Bot - sinf') ici pour qu'un modérateur puisse te vérifier "
-                                     "et donner accès au reste du serveur.\n\nHey there and welcome {}! Please give "
-                                     "your name and what studies you're following (e.g. 'Ingo Bot - sinf') so a "
+                                     "d'études (p.ex. 'Ingi Bot - sinf') ici pour qu'un modérateur puisse te vérifier "
+                                     "et te donner accès au reste du serveur.\n\nHey there and welcome {}! Please give "
+                                     "your name and the studies you're following (e.g. 'Ingi Bot - sinf') so a "
                                      "moderator can verify you and give you access to the rest of the server."
                                      "".format(member.mention, member.mention))
 
