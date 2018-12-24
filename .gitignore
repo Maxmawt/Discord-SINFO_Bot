@@ -109,3 +109,4 @@ venv.bak/
 #JSON
 
 config.json
+Bot/config.json
