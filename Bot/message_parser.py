@@ -3,6 +3,7 @@
 # This file contains all functions necessary to reply to messages
 
 import discord
+import random
 
 from course_handler import create_course, get_courses
 from discord_utils import AsyncTimer
@@ -170,3 +171,32 @@ def init(client):
         for course in courses:
             s += course + " | "
         await client.say(s.strip())
+
+    @client.command(aliases=['hello', 'hi', "bonjour", "bjr"], pass_context=True)
+    async def greetings(context):
+        """Answer with an hello message"""
+        if context.author == client.user:
+            return
+        if context.content.startswith('bonjour') or context.content.startswith('bjr'):
+            msg = 'Bonjour {0.author.mention} !'.format(context)
+        else:
+            msg = 'Hello {0.author.mention} !'.format(context)
+        await client.send_message(context.channel, msg)
+
+    @client.command(aliases=['haddockquote'], pass_context=True)
+    async def haddock_says(context):
+        """Give a quote from Haddock"""
+        "TODO: load the quotes from a json file"
+        if context.author == client.user:
+            return
+        quotes = ["Bachi-bouzouk !", "Mille millions de mille sabords !", "Bougres de faux jetons à la sauce tartare !",
+        "Coloquinte à la graisse de hérisson !", "Espèce de mérinos mal peignés !", "Cyrano à quatre pattes !",
+        "Zouave interplanétaire !", "Ectoplasme à roulettes !", "Bougre d’extrait de cornichon !", "Jus de poubelle !",
+        "Espèce de porc-épic mal embouché !", "Patagon de zoulous !", "Loup-garou à la graisse de renoncule !",
+        "Amiral de bateau-lavoir !", "Bayadère de carnaval !", "Bougres d’extrait de crétins des Alpes !" ,
+        "Espèce de chouette mal empaillée", "Macchabée d'eau de vaisselle !", "Astronaute d'eau douce !",
+        "Bulldozer à réaction !", "Simili-martien à la graisse de cabestan !", "Concentré de moules à gaufres !",
+        "Espèce de mitrailleur à bavette !", "Tchouck-tchouck-nougat !", "Garde-côtes à la mie de pain !",
+        "Papou des Carpates !", "Sombre oryctérope !", "Traîne-potence !"]
+        msg = random.choice(quotes)
+        await client.say(msg)
