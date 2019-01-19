@@ -180,7 +180,7 @@ def init(client):
         if context.content.startswith('bonjour') or context.content.startswith('bjr'):
             msg = 'Bonjour {0.author.mention} !'.format(context)
         else:
-            msg = 'Hello {0.author.mention} !'.format(context)
+            msg = 'Hello {0.author.mention}!'.format(context)
         await client.send_message(context.channel, msg)
 
     @client.command(aliases=['haddockquote'], pass_context=True)
@@ -193,7 +193,7 @@ def init(client):
         "Coloquinte à la graisse de hérisson !", "Espèce de mérinos mal peignés !", "Cyrano à quatre pattes !",
         "Zouave interplanétaire !", "Ectoplasme à roulettes !", "Bougre d’extrait de cornichon !", "Jus de poubelle !",
         "Espèce de porc-épic mal embouché !", "Patagon de zoulous !", "Loup-garou à la graisse de renoncule !",
-        "Amiral de bateau-lavoir !", "Bayadère de carnaval !", "Bougres d’extrait de crétins des Alpes !" ,
+        "Amiral de bateau-lavoir !", "Bayadère de carnaval !", "Bougre d’extrait de crétins des Alpes !" ,
         "Espèce de chouette mal empaillée", "Macchabée d'eau de vaisselle !", "Astronaute d'eau douce !",
         "Bulldozer à réaction !", "Simili-martien à la graisse de cabestan !", "Concentré de moules à gaufres !",
         "Espèce de mitrailleur à bavette !", "Tchouck-tchouck-nougat !", "Garde-côtes à la mie de pain !",
