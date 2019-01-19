@@ -2,6 +2,7 @@
 
 # This file contains all functions necessary to reply to messages
 import json
+import os
 
 import discord
 import random
@@ -9,7 +10,10 @@ import random
 from course_handler import create_course, get_courses
 from discord_utils import AsyncTimer
 
-with open("haddock.json") as f:
+haddock = '../haddock.json'
+dirname = os.path.dirname(__file__)
+filename = os.path.join(dirname, haddock)
+with open(filename) as f:
     quotes = json.load(f)["quotes"]
 
 
