@@ -1,6 +1,7 @@
 # created by Sami Bosch on Thursday, 08 November 2018
 
 # This file contains all functions necessary to reply to messages
+import json
 
 import discord
 import random
@@ -8,7 +9,8 @@ import random
 from course_handler import create_course, get_courses
 from discord_utils import AsyncTimer
 
-commands = ['yo bot', 'yea bot', 'yea boi']
+with open("haddock.json") as f:
+    quotes = json.load(f)["quotes"]
 
 
 def init(client):
@@ -35,6 +37,7 @@ def init(client):
                     for member in m.mentions:
                         await client.unban(m.server, member)
                         await client.send_message(m.channel, "unbanned {}".format(member.nick))
+
                 AsyncTimer(unban_time * 86400, unban_all)
         else:
             await client.say("You do not have the permission to ban users")
@@ -80,7 +83,7 @@ def init(client):
         else:
             await client.say("You do not have the permission to ban users")
 
-    @client.command(aliases=['add','ac'], pass_context=True)
+    @client.command(aliases=['add', 'ac'], pass_context=True)
     async def add_course(context):
         """Creates a channel and role for a list of courses."""
         m = context.message
@@ -175,28 +178,15 @@ def init(client):
     @client.command(aliases=['hello', 'hi', "bonjour", "bjr"], pass_context=True)
     async def greetings(context):
         """Answer with an hello message"""
-        if context.author == client.user:
-            return
-        if context.content.startswith('bonjour') or context.content.startswith('bjr'):
-            msg = 'Bonjour {0.author.mention} !'.format(context)
+        m = context.message
+        if m.content.startswith('!bonjour') or m.content.startswith('!bjr'):
+            msg = 'Bonjour {0.author.mention} !'.format(m)
         else:
-            msg = 'Hello {0.author.mention}!'.format(context)
-        await client.send_message(context.channel, msg)
+            msg = 'Hello {0.author.mention}!'.format(m)
+        await client.say(msg)
 
-    @client.command(aliases=['haddockquote'], pass_context=True)
+    @client.command(aliases=['haddockquote', 'haddock', 'hq'], pass_context=True)
     async def haddock_says(context):
         """Give a quote from Haddock"""
-        "TODO: load the quotes from a json file"
-        if context.author == client.user:
-            return
-        quotes = ["Bachi-bouzouk !", "Mille millions de mille sabords !", "Bougres de faux jetons à la sauce tartare !",
-        "Coloquinte à la graisse de hérisson !", "Espèce de mérinos mal peignés !", "Cyrano à quatre pattes !",
-        "Zouave interplanétaire !", "Ectoplasme à roulettes !", "Bougre d’extrait de cornichon !", "Jus de poubelle !",
-        "Espèce de porc-épic mal embouché !", "Patagon de zoulous !", "Loup-garou à la graisse de renoncule !",
-        "Amiral de bateau-lavoir !", "Bayadère de carnaval !", "Bougre d’extrait de crétins des Alpes !" ,
-        "Espèce de chouette mal empaillée", "Macchabée d'eau de vaisselle !", "Astronaute d'eau douce !",
-        "Bulldozer à réaction !", "Simili-martien à la graisse de cabestan !", "Concentré de moules à gaufres !",
-        "Espèce de mitrailleur à bavette !", "Tchouck-tchouck-nougat !", "Garde-côtes à la mie de pain !",
-        "Papou des Carpates !", "Sombre oryctérope !", "Traîne-potence !"]
         msg = random.choice(quotes)
         await client.say(msg)
