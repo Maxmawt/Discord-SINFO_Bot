@@ -9,6 +9,7 @@ import random
 
 from course_handler import create_course, get_courses
 from discord_utils import AsyncTimer
+from tex_handler import *
 
 haddock = '../haddock.json'
 dirname = os.path.dirname(__file__)
@@ -194,3 +195,25 @@ def init(client):
         """Give a quote from Haddock"""
         msg = random.choice(quotes)
         await client.say(msg)
+
+    """
+        This command is greatly inspired by the bot of DXsmiley on github:
+        https://github.com/DXsmiley/LatexBot
+		To implement this command you must install on linux:
+		texlive, dvipng
+    """
+    @client.command(aliases=['tex'], pass_context=True)
+    async def latex(context):
+		"""Answer with the text send, generated in latex. (in the align* environment)"""
+        m = context.message
+
+        my_latex = m.content[4:].strip()
+        num = str(random.randint(0, 2 ** 31))
+        fn = generate_image(my_latex, num)
+
+        if fn and os.path.getsize(fn) > 0:
+            await client.send_file(m.channel, fn)
+        else:
+            await client.say('Something broke. Check the syntax of your message. :frowning:')
+
+        cleanup_output_files(num)
