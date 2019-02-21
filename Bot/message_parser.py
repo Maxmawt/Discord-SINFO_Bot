@@ -6,6 +6,7 @@ import os
 
 import discord
 import random
+from datetime import date
 
 from course_handler import create_course, get_courses
 from discord_utils import AsyncTimer
@@ -184,17 +185,68 @@ def init(client):
     async def greetings(context):
         """Answer with an hello message"""
         m = context.message
+        arg = m.content[m.content.find(" "):].strip()
         if m.content.startswith('!bonjour') or m.content.startswith('!bjr'):
-            msg = 'Bonjour {0.author.mention} !'.format(m)
+            msg = 'Bonjour {} !'.format(arg)
+            #msg = 'Bonjour {0.author.mention} !'.format(m)
         else:
-            msg = 'Hello {0.author.mention}!'.format(m)
+            msg = 'Hello {} !'.format(arg)
         await client.say(msg)
+        await client.delete_message(context.message)
 
     @client.command(aliases=['haddockquote', 'haddock', 'hq'], pass_context=True)
     async def haddock_says(context):
         """Give a quote from Haddock"""
         msg = random.choice(quotes)
         await client.say(msg)
+
+    @client.command(aliases=['banquet',"date_until_banquet",'date_until_banquet_sinfo', 'meilleur_banquet', 'banquet_de_l_univers', 'banquet_epl', 'meilleur_banquet_de_l_univers'], pass_context=True)
+    async def banquet_sinfo(context):
+        """Give the number of day until BANQUET SINFO"""
+        today = date.today()
+        date_banquet = date(2019, 4, 23)
+        delta = date_banquet - today
+        if delta.days == 0:
+            msg = "Trop bien c'est le jour J, j'ai vraiment hâte d'y être :D"
+        elif delta.days == 1:
+            msg = "Demain, se déroulera le meilleur banquet de l'univers :D"
+        elif delta.days == 7:
+            msg = "Dans une semaine, c'est le banquet SINFO, viendez ! :D"
+        elif delta.days == 50:
+            msg = "Aujourd'hui c'est le banquet elec.... mais bon, on s'en ballec :D Notre banquet (le meilleur de l'univers), c'est dans 50 jours :D"
+            #TODO identifier tous les elecs du discord
+        else:
+            msg = 'J-{}'.format(delta.days)
+        await client.say(msg)
+
+    @client.command(pass_context=True)
+    async def jeanne(context):
+        """Who is Jeanne ?"""
+        await client.say("AU SECOUUUUUUUURS !\nhttps://tenor.com/GfhV.gif")
+
+    @client.command(pass_context=True)
+    async def philippe(context):
+        """Commande à utiliser avec *beaucoup* de précautions"""
+        choices = ["SALAUD !", "JE SAIS OÙ TU TE CACHES !", "VIENS ICI QUE JE TE BUTE SALE ENCULÉ", "https://tenor.com/3Qx2.gif", "TA GUEULE !"]
+        msg = random.choice(choices)
+        await client.say(msg)
+
+    @client.command(aliases=['shrug'],pass_context=True)
+    async def goodenough(context):
+        """Shrug David Goodenough style"""
+        path = "img/goodenough.png"
+        await client.send_file(context.message.channel, path)
+
+    @client.command(pass_context=True)
+    async def bogaert(context):
+        """Face of heaven"""
+        path = "img/bogaert.png"
+        await client.send_file(context.message.channel, path)
+
+    @client.command(aliases=['https://tenor.com/NMDa.gif'],pass_context=True)
+    async def hello_there(context):
+        "Hello there (tip: try with a gif url command)"
+        await client.say("https://tenor.com/V1tn.gif ")
 
     """
         This command is greatly inspired by the bot of DXsmiley on github:
