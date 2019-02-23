@@ -25,6 +25,9 @@ bogname = os.path.join(dirname, bogaert)
 goodenough = 'img/goodenough.png'
 goodname = os.path.join(dirname, goodenough)
 
+goodenough = 'img/ohno.png'
+goodname = os.path.join(dirname, goodenough)
+
 starttime = time.time()
 
 
@@ -289,6 +292,17 @@ def init(client):
         async def uptime(self):
             """Up time. Not down."""
             await client.say("Up time: {}".format(conv_time(time.time() - starttime)))
+
+        @commands.command(pass_context=False)
+        async def uptime(self):
+            """Is it me or is inginious down?"""
+            response = os.system("ping -c 1 inginious.info.ucl.ac.be")
+
+            # and then check the response...
+            if response == 0:
+                client.say("Inginious is up!")
+            else:
+                client.say("Oh no, Inginious is ded.")
 
     client.add_cog(Moderate())
     client.add_cog(Courses())
