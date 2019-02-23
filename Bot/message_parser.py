@@ -18,6 +18,12 @@ filename = os.path.join(dirname, haddock)
 with open(filename) as f:
     quotes = json.load(f)["quotes"]
 
+bogaert = 'img/bogaert.png'
+bogname = os.path.join(dirname, bogaert)
+
+goodenough = 'img/goodenough.png'
+goodname = os.path.join(dirname, goodenough)
+
 
 def init(client):
     @client.command(pass_context=True)
@@ -235,13 +241,12 @@ def init(client):
     async def goodenough(context):
         """Shrug David Goodenough style"""
         path = "img/goodenough.png"
-        await client.send_file(context.message.channel, path)
+        await client.send_file(context.message.channel, goodname)
 
     @client.command(pass_context=True)
     async def bogaert(context):
         """Face of heaven"""
-        path = "img/bogaert.png"
-        await client.send_file(context.message.channel, path)
+        await client.send_file(context.message.channel, bogname)
 
     @client.command(aliases=['https://tenor.com/NMDa.gif'],pass_context=True)
     async def hello_there(context):
