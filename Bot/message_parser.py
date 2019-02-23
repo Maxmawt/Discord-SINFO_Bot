@@ -204,7 +204,7 @@ def init(client):
             else:
                 msg = 'Hello {} !'.format(arg)
             await client.say(msg)
-            await client.delete_message(self, context.message)
+            await client.delete_message(context.message)
 
         @commands.command(aliases=['haddockquote', 'haddock', 'hq'], pass_context=False)
         async def haddock_says(self):
@@ -250,12 +250,12 @@ def init(client):
         @commands.command(aliases=['shrug'], pass_context=True)
         async def goodenough(self, context):
             """Shrug David Goodenough style"""
-            await client.send_file(self, context.message.channel, goodname)
+            await client.send_file(context.message.channel, goodname)
 
         @commands.command(pass_context=True)
         async def bogaert(self, context):
             """Face of heaven"""
-            await client.send_file(self, context.message.channel, bogname)
+            await client.send_file(context.message.channel, bogname)
 
         @commands.command(aliases=['https://tenor.com/NMDa.gif'], pass_context=False)
         async def hello_there(self):
@@ -288,7 +288,7 @@ def init(client):
         @commands.command(pass_context=False)
         async def uptime(self):
             """Up time. Not down."""
-            client.say("Up time: {}s".format(conv_time(time.time() - starttime)))
+            await client.say("Up time: {}".format(conv_time(time.time() - starttime)))
 
     client.add_cog(Moderate())
     client.add_cog(Courses())
