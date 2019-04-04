@@ -5,6 +5,9 @@ import json
 import random
 import time
 from datetime import date
+import socket
+from urllib.request import urlopen
+from urllib.error import HTTPError
 
 import discord
 from discord.ext import commands
@@ -296,14 +299,13 @@ def init(client):
         @commands.command(pass_context=True)
         async def inginious(self, context):
             """Is it me or is inginious down?"""
-            response = os.system("ping -c 1 inginious.info.ucl.ac.be")
-
-            # and then check the response...
-            if response == 0:
-                await client.say("Inginious is up!")
-            else:
+            try:
+                urlopen('https://inginious.info.ucl.ac.be/', timeout=5)
+            except (HTTPError, socket.timeout):
                 await client.say("Oh no, Inginious is ded.")
                 await client.send_file(context.message.channel, ohnoname)
+            else:
+                await client.say("Inginious is up!")
 
     client.add_cog(Moderate())
     client.add_cog(Courses())
