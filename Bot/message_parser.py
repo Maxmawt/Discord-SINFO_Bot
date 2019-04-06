@@ -319,8 +319,11 @@ def init(client):
             """Encode the specified message into b64 encoding"""
             m = context.message
             if m.content.find(" ") > 0:
-                arg = m.content.split(" ")[-1]
-                b64 = base64.b64encode(arg.encode('utf-8'))
+                #on prend tous les mots suivant
+                words = m.content.split(" ")[1:]
+                delimiter = ' '
+                msg = delimiter.join(words)
+                b64 = base64.b64encode(msg.encode('utf-8'))
                 #le decode('utf-8') est utilisé pour éviter que Python n'affiche b'' en plus
                 await client.say(b64.decode('utf-8'))
 
@@ -339,7 +342,9 @@ def init(client):
             """Encode a String into Hexadecimal representation"""
             m = context.message
             if m.content.find(" ") > 0:
-                arg = m.content.split(" ")[-1]
+                words = m.content.split(" ")[1:]
+                delimiter = ' '
+                arg = delimiter.join(words)
                 msg = arg.encode('utf-8').hex()
                 await client.say(msg)
 
