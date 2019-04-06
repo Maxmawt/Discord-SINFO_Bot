@@ -15,6 +15,8 @@ from discord.ext import commands
 from course_handler import create_course, get_courses
 from discord_utils import AsyncTimer, conv_time
 from tex_handler import *
+import base64
+import codecs
 
 haddock = '../haddock.json'
 dirname = os.path.dirname(__file__)
@@ -306,6 +308,50 @@ def init(client):
                 await client.send_file(context.message.channel, ohnoname)
             else:
                 await client.say("Inginious is up!")
+
+        @commands.command(pass_context=True)
+        async def ping(self):
+            """Conveniance method to see if bot is running or not"""
+            await client.say("pong !")
+        
+        @commands.command(aliases=["b64e"],pass_context=True)
+        async def b64encode(context):
+            """Encode the specified message into b64 encoding"""
+            m = context.message
+            if m.content.find(" ") > 0:
+                arg = m.content.split(" ")[-1]
+                b64 = base64.b64encode(arg.encode('utf-8'))
+                #le decode('utf-8') est utilisé pour éviter que Python n'affiche b'' en plus
+                await client.say(b64.decode('utf-8'))
+
+        @commands.command(aliases=["b64d"],pass_context=True)
+        async def b64decode(context):
+            """Decode the specified message from b64 encoding"""
+            m = context.message
+            if m.content.find(" ") > 0:
+                arg = m.content.split(" ")[-1]
+                msg = base64.b64decode(arg)
+                #le decode('utf-8') est utilisé pour éviter que Python n'affiche b'' en plus
+                await client.say(msg.decode('utf-8'))
+        
+        @commands.command(aliases=["sth"],pass_context=True)
+        async def strtohex(context):
+            """Encode a String into Hexadecimal representation"""
+            m = context.message
+            if m.content.find(" ") > 0:
+                arg = m.content.split(" ")[-1]
+                msg = arg.encode('utf-8').hex()
+                await client.say(msg)
+
+        @commands.command(aliases=["hts"],pass_context=True)
+        async def hextostr(context):
+            """Decode a String from Hexadecimal representation"""
+            m = context.message
+            if m.content.find(" ") > 0:
+                decode_hex = codecs.getdecoder("hex_codec")
+                arg = m.content.split(" ")[-1]
+                msg = decode_hex(arg)[0]
+                await client.say(msg.decode('utf-8'))
 
     client.add_cog(Moderate())
     client.add_cog(Courses())
