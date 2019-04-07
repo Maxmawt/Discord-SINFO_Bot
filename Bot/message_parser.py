@@ -315,7 +315,7 @@ def init(client):
             await client.say("pong !")
         
         @commands.command(aliases=["b64e"],pass_context=True)
-        async def b64encode(context):
+        async def b64encode(self, context):
             """Encode the specified message into b64 encoding"""
             m = context.message
             if m.content.find(" ") > 0:
@@ -328,7 +328,7 @@ def init(client):
                 await client.say(b64.decode('utf-8'))
 
         @commands.command(aliases=["b64d"],pass_context=True)
-        async def b64decode(context):
+        async def b64decode(self, context):
             """Decode the specified message from b64 encoding"""
             m = context.message
             if m.content.find(" ") > 0:
@@ -338,7 +338,7 @@ def init(client):
                 await client.say(msg.decode('utf-8'))
         
         @commands.command(aliases=["sth"],pass_context=True)
-        async def strtohex(context):
+        async def strtohex(self, context):
             """Encode a String into Hexadecimal representation"""
             m = context.message
             if m.content.find(" ") > 0:
@@ -349,7 +349,7 @@ def init(client):
                 await client.say(msg)
 
         @commands.command(aliases=["hts"],pass_context=True)
-        async def hextostr(context):
+        async def hextostr(self, context):
             """Decode a String from Hexadecimal representation"""
             m = context.message
             if m.content.find(" ") > 0:
