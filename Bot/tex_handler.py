@@ -1,7 +1,9 @@
 # created by Luis Tascon Gutierrez on Thursday, 12 february 2019
 import os
 
-LATEX_TEMPLATE = '../template.tex'
+dirname = os.path.dirname(__file__)
+LATEX_NAME = '../template.tex'
+LATEX_TEMPLATE = os.path.join(dirname, LATEX_NAME)
 
 
 # Generate LaTeX locally.
