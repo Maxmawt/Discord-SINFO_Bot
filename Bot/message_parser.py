@@ -206,7 +206,7 @@ def init(client):
             """Answer with an hello message. DO NOT PING PEOPLE WITH THIS."""
             m = context.message
             arg = m.content[m.content.find(" "):].strip()
-            if m.mentions is None:
+            if len(m.mentions) == 0:
                 if m.content.startswith('!bonjour') or m.content.startswith('!bjr'):
                     msg = 'Bonjour {} !'.format(arg)
                     # msg = 'Bonjour {0.author.mention} !'.format(m)
