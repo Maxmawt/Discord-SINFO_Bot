@@ -96,12 +96,12 @@ def init(client):
                     await client.add_roles(member, muted)
                     await client.say("Muted {} for {} minutes".format(member.nick, int(mute_time)))
                 if mute_time >= 0:
-                    async def unban_all():
+                    async def unmute_all():
                         for mem in m.mentions:
                             await client.remove_roles(mem, muted)
                             await client.send_message(m.channel, "Unmuted {}".format(mem.nick))
 
-                    AsyncTimer(mute_time * 60, unban_all)
+                    AsyncTimer(mute_time * 60, unmute_all)
             elif mute_time == -1:
                 await client.say("Please provide a time (in minutes)")
             else:
@@ -203,16 +203,27 @@ def init(client):
     class Random:
         @commands.command(aliases=['hello', 'hi', "bonjour", "bjr"], pass_context=True)
         async def greetings(self, context):
-            """Answer with an hello message"""
+            """Answer with an hello message. DO NOT PING PEOPLE WITH THIS."""
             m = context.message
             arg = m.content[m.content.find(" "):].strip()
-            if m.content.startswith('!bonjour') or m.content.startswith('!bjr'):
-                msg = 'Bonjour {} !'.format(arg)
-                # msg = 'Bonjour {0.author.mention} !'.format(m)
+            if m.mentions is None:
+                if m.content.startswith('!bonjour') or m.content.startswith('!bjr'):
+                    msg = 'Bonjour {} !'.format(arg)
+                    # msg = 'Bonjour {0.author.mention} !'.format(m)
+                else:
+                    msg = 'Hello {} !'.format(arg)
+                await client.say(msg)
+                await client.delete_message(context.message)
             else:
-                msg = 'Hello {} !'.format(arg)
-            await client.say(msg)
-            await client.delete_message(context.message)
+                muted = discord.utils.get(m.server.roles, name='Muted')
+                await client.add_roles(m.author, muted)
+                await client.say("Muted {} for {} minutes".format(m.author.nick, 5))
+
+                async def unmute_all():
+                    await client.remove_roles(m.author, muted)
+                    await client.send_message(m.channel, "Unmuted {}".format(m.author.nick))
+
+                AsyncTimer(5 * 60, unmute_all)
 
         @commands.command(aliases=['haddockquote', 'haddock', 'hq'], pass_context=False)
         async def haddock_says(self):
