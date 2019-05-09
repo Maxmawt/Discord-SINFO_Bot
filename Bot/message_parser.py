@@ -7,7 +7,7 @@ import time
 from datetime import date
 import socket
 from urllib.request import urlopen
-from urllib.error import HTTPError
+from urllib.error import URLError
 
 import discord
 from discord.ext import commands
@@ -314,7 +314,7 @@ def init(client):
             """Is it me or is inginious down?"""
             try:
                 urlopen('https://inginious.info.ucl.ac.be/', timeout=5)
-            except (HTTPError, socket.timeout):
+            except (URLError, socket.timeout):
                 await client.say("Oh no, Inginious is ded.")
                 await client.send_file(context.message.channel, ohnoname)
             else:
