@@ -37,7 +37,7 @@ starttime = time.time()
 
 
 def init(client):
-    class Moderate:
+    class Moderate(commands.Cog):
         @commands.command(pass_context=True)
         async def ban(self, context):
             """Takes a list of mentioned users + optionally an int. Bans all users in list, and if int has been
@@ -51,38 +51,38 @@ def init(client):
             else:
                 unban_time = -1
 
-            if m.author.server_permissions.ban_members:
+            if m.author.guild_permissions.ban_members:
                 for member in m.mentions:
-                    await client.ban(member, delete_message_days=0)
-                    await client.say("banned {} for {} days (-1 = indefinite)".format(member.nick, unban_time))
+                    await member.ban(delete_message_days=0)
+                    await context.send("banned {} for {} days (-1 = indefinite)".format(member.nick, unban_time))
 
                 if unban_time >= 0:
                     async def unban_all():
                         for mem in m.mentions:
-                            await client.unban(m.server, mem)
-                            await client.send_message(m.channel, "unbanned {}".format(mem.nick))
+                            await mem.unban(mem)
+                            await context.send("unbanned {}".format(mem.nick))
 
                     AsyncTimer(unban_time * 86400, unban_all)
             else:
-                await client.say("You do not have the permission to ban users")
+                await context.send("You do not have the permission to ban users")
 
         @commands.command(pass_context=True)
         async def kick(self, context):
             """Takes a list of mentioned users and kicks them all."""
             m = context.message
-            if m.author.server_permissions.kick_members:
+            if m.author.guild_permissions.kick_members:
                 for member in m.mentions:
-                    await client.kick(member)
-                    await client.say("kicked {}".format(member.nick))
+                    await member.kick
+                    await context.send("kicked {}".format(member.nick))
             else:
-                await client.say("You do not have the permission to kick users")
+                await context.send("You do not have the permission to kick users")
 
         @commands.command(aliases=['mute', 'silence'], pass_context=True)
         async def timeout(self, context):
             """Takes a list of mentioned users and a timeout at the end of the message and silences all users for the
             specified time in minutes."""
             m = context.message
-            muted = discord.utils.get(m.server.roles, name='Muted')
+            muted = discord.utils.get(m.guild.roles, name='Muted')
             if m.content.find(" ") > 0:
                 try:
                     mute_time = float(m.content.split(" ")[-1])
@@ -91,42 +91,42 @@ def init(client):
             else:
                 mute_time = -1
 
-            if m.author.server_permissions.manage_roles and mute_time >= 0:
+            if m.author.guild_permissions.manage_roles and mute_time >= 0:
                 for member in m.mentions:
-                    await client.add_roles(member, muted)
-                    await client.say("Muted {} for {} minutes".format(member.nick, int(mute_time)))
+                    await member.add_roles(muted)
+                    await context.send("Muted {} for {} minutes".format(member.nick, int(mute_time)))
                 if mute_time >= 0:
                     async def unmute_all():
                         for mem in m.mentions:
-                            await client.remove_roles(mem, muted)
-                            await client.send_message(m.channel, "Unmuted {}".format(mem.nick))
+                            await mem.remove_roles(muted)
+                            await context.send("Unmuted {}".format(mem.nick))
 
                     AsyncTimer(mute_time * 60, unmute_all)
             elif mute_time == -1:
-                await client.say("Please provide a time (in minutes)")
+                await context.send("Please provide a time (in minutes)")
             else:
-                await client.say("You do not have the permission to ban users")
+                await context.send("You do not have the permission to ban users")
 
-    class Courses:
+    class Courses(commands.Cog):
         @commands.command(aliases=['add', 'ac'], pass_context=True)
         async def add_course(self, context):
             """Creates a channel and role for a list of courses."""
             m = context.message
             u = m.author
-            if u.server_permissions.manage_channels:
+            if u.guild_permissions.manage_channels:
                 message = m.content
                 if message.find(" ") > 0:
                     for name in message.split(" ")[1:]:
-                        role = discord.utils.get(m.server.roles, name=name.upper())
+                        role = discord.utils.get(m.guild.roles, name=name.upper())
                         if role:
-                            await client.say("Course exists!")
+                            await context.send("Course exists!")
                         else:
-                            await create_course(name, client, m.server)
-                            await client.say("Created channel and role {}".format(name))
+                            await create_course(name, m.guild)
+                            await context.send("Created channel and role {}".format(name))
                 else:
-                    await client.say("Please provide a name")
+                    await context.send("Please provide a name")
             else:
-                await client.say("You don't have the permissions to use this command.")
+                await context.send("You don't have the permissions to use this command.")
 
         @commands.command(aliases=['follow', 'fc'], pass_context=True)
         async def follow_course(self, context):
@@ -141,9 +141,9 @@ def init(client):
                 fail = ""
                 refused = ""
                 for name in message.split(" ")[1:]:
-                    role = discord.utils.get(m.server.roles, name=name.upper())
+                    role = discord.utils.get(m.guild.roles, name=name.upper())
                     if role:
-                        annonceur = discord.utils.get(m.server.roles, name="Annonceur")
+                        annonceur = discord.utils.get(m.guild.roles, name="Annonceur")
                         if role >= annonceur or role in u.roles:
                             refused += name + " "
                         else:
@@ -154,10 +154,10 @@ def init(client):
                 full = "You successfully followed: " + success.strip() + "\n" if success else ""
                 full += "Couldn't follow: " + refused.strip() + "\n" if refused else ""
                 full += "Couldn't find: " + fail.strip() if fail else ""
-                await client.add_roles(u, *roles)
-                await client.send_message(u, full.strip())
+                await u.add_roles(*roles)
+                await u.send(full.strip())
             else:
-                await client.say("Please provide a course to follow")
+                await context.send("Please provide a course to follow")
 
         @commands.command(aliases=['unfollow', 'uc'], pass_context=True)
         async def unfollow_course(self, context):
@@ -172,9 +172,9 @@ def init(client):
                 fail = ""
                 refused = ""
                 for name in message.split(" ")[1:]:
-                    role = discord.utils.get(m.server.roles, name=name.upper())
+                    role = discord.utils.get(m.guild.roles, name=name.upper())
                     if role:
-                        annonceur = discord.utils.get(m.server.roles, name="Annonceur")
+                        annonceur = discord.utils.get(m.guild.roles, name="Annonceur")
                         if role >= annonceur or role not in u.roles:
                             refused += name + " "
                         else:
@@ -185,22 +185,22 @@ def init(client):
                 full = "You successfully unfollowed: " + success.strip() + "\n" if success else ""
                 full += "Couldn't unfollow: " + refused.strip() + "\n" if refused else ""
                 full += "Couldn't find: " + fail.strip() if fail else ""
-                await client.remove_roles(u, *roles)
-                await client.send_message(u, full.strip())
+                await u.remove_roles(*roles)
+                await u.send(full.strip())
             else:
-                await client.say("Please provide a course to follow")
+                await context.send("Please provide a course to follow")
 
         @commands.command(aliases=['list', 'lc'], pass_context=True)
         async def list_courses(self, context):
-            """Lists all available courses in the server."""
-            courses = get_courses(context.message.server)
+            """Lists all available courses in the guild."""
+            courses = get_courses(context.message.guild)
 
             s = "| "
             for course in courses:
                 s += course + " | "
-            await client.say(s.strip())
+            await context.send(s.strip())
 
-    class Random:
+    class Random(commands.Cog):
         @commands.command(aliases=['hello', 'hi', "bonjour", "bjr"], pass_context=True)
         async def greetings(self, context):
             """Answer with an hello message. DO NOT PING PEOPLE WITH THIS."""
@@ -212,29 +212,29 @@ def init(client):
                     # msg = 'Bonjour {0.author.mention} !'.format(m)
                 else:
                     msg = 'Hello {} !'.format(arg)
-                await client.say(msg)
-                await client.delete_message(context.message)
+                await context.send(msg)
+                await m.delete()
             else:
-                muted = discord.utils.get(m.server.roles, name='Muted')
-                await client.add_roles(m.author, muted)
-                await client.say("Muted {} for {} minutes".format(m.author.nick, 5))
+                muted = discord.utils.get(m.guild.roles, name='Muted')
+                await m.author.add_roles(muted)
+                await context.send("Muted {} for {} minutes".format(m.author.nick, 5))
 
                 async def unmute_all():
-                    await client.remove_roles(m.author, muted)
-                    await client.send_message(m.channel, "Unmuted {}".format(m.author.nick))
+                    await m.author.remove_roles(muted)
+                    await m.channel.send("Unmuted {}".format(m.author.nick))
 
                 AsyncTimer(5 * 60, unmute_all)
 
-        @commands.command(aliases=['haddockquote', 'haddock', 'hq'], pass_context=False)
-        async def haddock_says(self):
+        @commands.command(aliases=['haddockquote', 'haddock', 'hq'], pass_context=True)
+        async def haddock_says(self, context):
             """Give a quote from Haddock"""
             msg = random.choice(quotes)
-            await client.say(msg)
+            await context.send(msg)
 
         @commands.command(aliases=['banquet', "date_until_banquet", 'date_until_banquet_sinfo', 'meilleur_banquet',
                                    'banquet_de_l_univers', 'banquet_epl', 'meilleur_banquet_de_l_univers'],
-                          pass_context=False)
-        async def banquet_sinfo(self):
+                          pass_context=True)
+        async def banquet_sinfo(self, context):
             """Give the number of day until BANQUET SINFO"""
             today = date.today()
             date_banquet = date(2019, 4, 23)
@@ -249,39 +249,41 @@ def init(client):
                 msg = "Aujourd'hui c'est le banquet elec.... mais bon, on s'en ballec :D Notre banquet (le meilleur " \
                       "de l'univers), c'est dans 50 jours :D "
                 # TODO identifier tous les elecs du discord
+            elif delta.days < 0:
+                msg = "Ca fait longtemps la salaud."
             else:
                 msg = 'J-{}'.format(delta.days)
-            await client.say(msg)
+            await context.send(msg)
 
-        @commands.command(pass_context=False)
-        async def jeanne(self):
+        @commands.command(pass_context=True)
+        async def jeanne(self, context):
             """Who is Jeanne ?"""
-            await client.say("AU SECOUUUUUUUURS !\nhttps://tenor.com/GfhV.gif")
+            await context.send("AU SECOUUUUUUUURS !\nhttps://tenor.com/GfhV.gif")
 
-        @commands.command(pass_context=False)
-        async def philippe(self):
+        @commands.command(pass_context=True)
+        async def philippe(self, context):
             """Commande à utiliser avec *beaucoup* de précautions"""
             choices = ["SALAUD !", "JE SAIS OÙ TU TE CACHES !", "VIENS ICI QUE JE TE BUTE SALE ENCULÉ",
                        "https://tenor.com/3Qx2.gif", "TA GUEULE !"]
             msg = random.choice(choices)
-            await client.say(msg)
+            await context.send(msg)
 
         @commands.command(aliases=['shrug'], pass_context=True)
         async def goodenough(self, context):
             """Shrug David Goodenough style"""
-            await client.send_file(context.message.channel, goodname)
+            await context.send(file=discord.File(goodname))
 
         @commands.command(pass_context=True)
         async def bogaert(self, context):
             """Face of heaven"""
-            await client.send_file(context.message.channel, bogname)
+            await context.send(file=discord.File(bogname))
 
-        @commands.command(aliases=['https://tenor.com/NMDa.gif'], pass_context=False)
-        async def hello_there(self):
+        @commands.command(aliases=['https://tenor.com/NMDa.gif'], pass_context=True)
+        async def hello_there(self, context):
             """Hello there (tip: try with a gif url command)"""
-            await client.say("https://tenor.com/V1tn.gif ")
+            await context.send("https://tenor.com/V1tn.gif ")
 
-    class Utilitary:
+    class Utilitary(commands.Cog):
         """
             This command is greatly inspired by the bot of DXsmiley on github:
             https://github.com/DXsmiley/LatexBot
@@ -298,16 +300,16 @@ def init(client):
             fn = generate_image(my_latex, num)
 
             if fn and os.path.getsize(fn) > 0:
-                await client.send_file(m.channel, fn)
+                await context.send(file=discord.File(fn))
             else:
-                await client.say('Something broke. Check the syntax of your message. :frowning:')
+                await context.send('Something broke. Check the syntax of your message. :frowning:')
 
             cleanup_output_files(num)
 
-        @commands.command(pass_context=False)
-        async def uptime(self):
+        @commands.command(pass_context=True)
+        async def uptime(self, context):
             """Up time. Not down."""
-            await client.say("Up time: {}".format(conv_time(time.time() - starttime)))
+            await context.send("Up time: {}".format(conv_time(time.time() - starttime)))
 
         @commands.command(pass_context=True)
         async def inginious(self, context):
@@ -315,15 +317,15 @@ def init(client):
             try:
                 urlopen('https://inginious.info.ucl.ac.be/', timeout=5)
             except (URLError, socket.timeout):
-                await client.say("Oh no, Inginious is ded.")
-                await client.send_file(context.message.channel, ohnoname)
+                await context.send("Oh no, Inginious is ded.")
+                await context.send(file=discord.File(ohnoname))
             else:
-                await client.say("Inginious is up!")
+                await context.send("Inginious is up!")
 
         @commands.command(pass_context=True)
-        async def ping(self):
+        async def ping(self, context):
             """Conveniance method to see if bot is running or not"""
-            await client.say("pong !")
+            await context.send("pong !")
         
         @commands.command(aliases=["b64e"],pass_context=True)
         async def b64encode(self, context):
@@ -336,7 +338,7 @@ def init(client):
                 msg = delimiter.join(words)
                 b64 = base64.b64encode(msg.encode('utf-8'))
                 #le decode('utf-8') est utilisé pour éviter que Python n'affiche b'' en plus
-                await client.say(b64.decode('utf-8'))
+                await context.send(b64.decode('utf-8'))
 
         @commands.command(aliases=["b64d"],pass_context=True)
         async def b64decode(self, context):
@@ -346,7 +348,7 @@ def init(client):
                 arg = m.content.split(" ")[-1]
                 msg = base64.b64decode(arg)
                 #le decode('utf-8') est utilisé pour éviter que Python n'affiche b'' en plus
-                await client.say(msg.decode('utf-8'))
+                await context.send(msg.decode('utf-8'))
         
         @commands.command(aliases=["sth"],pass_context=True)
         async def strtohex(self, context):
@@ -357,7 +359,7 @@ def init(client):
                 delimiter = ' '
                 arg = delimiter.join(words)
                 msg = arg.encode('utf-8').hex()
-                await client.say(msg)
+                await context.send(msg)
 
         @commands.command(aliases=["hts"],pass_context=True)
         async def hextostr(self, context):
@@ -367,7 +369,7 @@ def init(client):
                 decode_hex = codecs.getdecoder("hex_codec")
                 arg = m.content.split(" ")[-1]
                 msg = decode_hex(arg)[0]
-                await client.say(msg.decode('utf-8'))
+                await context.send(msg.decode('utf-8'))
 
     client.add_cog(Moderate())
     client.add_cog(Courses())
