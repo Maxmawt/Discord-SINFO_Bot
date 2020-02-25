@@ -290,6 +290,7 @@ def init(client):
             To implement this command you must install on linux:
             texlive, dvipng
         """
+
         @commands.command(aliases=['tex'], pass_context=True)
         async def latex(self, context):
             """Answer with the text send, generated in latex. (in the align* environment)"""
@@ -326,31 +327,31 @@ def init(client):
         async def ping(self, context):
             """Conveniance method to see if bot is running or not"""
             await context.send("pong !")
-        
-        @commands.command(aliases=["b64e"],pass_context=True)
+
+        @commands.command(aliases=["b64e"], pass_context=True)
         async def b64encode(self, context):
             """Encode the specified message into b64 encoding"""
             m = context.message
             if m.content.find(" ") > 0:
-                #on prend tous les mots suivant
+                # on prend tous les mots suivant
                 words = m.content.split(" ")[1:]
                 delimiter = ' '
                 msg = delimiter.join(words)
                 b64 = base64.b64encode(msg.encode('utf-8'))
-                #le decode('utf-8') est utilisé pour éviter que Python n'affiche b'' en plus
+                # le decode('utf-8') est utilisé pour éviter que Python n'affiche b'' en plus
                 await context.send(b64.decode('utf-8'))
 
-        @commands.command(aliases=["b64d"],pass_context=True)
+        @commands.command(aliases=["b64d"], pass_context=True)
         async def b64decode(self, context):
             """Decode the specified message from b64 encoding"""
             m = context.message
             if m.content.find(" ") > 0:
                 arg = m.content.split(" ")[-1]
                 msg = base64.b64decode(arg)
-                #le decode('utf-8') est utilisé pour éviter que Python n'affiche b'' en plus
+                # le decode('utf-8') est utilisé pour éviter que Python n'affiche b'' en plus
                 await context.send(msg.decode('utf-8'))
-        
-        @commands.command(aliases=["sth"],pass_context=True)
+
+        @commands.command(aliases=["sth"], pass_context=True)
         async def strtohex(self, context):
             """Encode a String into Hexadecimal representation"""
             m = context.message
@@ -361,7 +362,7 @@ def init(client):
                 msg = arg.encode('utf-8').hex()
                 await context.send(msg)
 
-        @commands.command(aliases=["hts"],pass_context=True)
+        @commands.command(aliases=["hts"], pass_context=True)
         async def hextostr(self, context):
             """Decode a String from Hexadecimal representation"""
             m = context.message
@@ -375,3 +376,16 @@ def init(client):
     client.add_cog(Courses())
     client.add_cog(Random())
     client.add_cog(Utilitary())
+
+    # All events unrelated to message parsing go here
+
+    @client.event
+    async def on_member_join(member):
+        server = member.server
+        welcome = server.get_channel(509372274143657984)
+        await welcome.send_message("Bonjour %s et bienvenue dans le serveur SINFO! Indique ton nom et ta section "
+                                   "d'études (p.ex. 'Ingi Bot - sinf') ici pour qu'un modérateur puisse te vérifier "
+                                   "et te donner accès au reste du serveur.\n\nHey there and welcome %s! Please give "
+                                   "your name and the studies you're following (e.g. 'Ingi Bot - sinf') so a "
+                                   "moderator can verify you and give you access to the rest of the server."
+                                   % (member.mention, member.mention))
