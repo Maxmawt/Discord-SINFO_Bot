@@ -9,7 +9,9 @@ from message_parser import init
 
 def runbot(token):
     """Initializes the client's command handler and other non command related functionalities."""
-    client = Bot(command_prefix="!")
+    intents = discord.Intents.default()
+    intents.members = True
+    client = Bot(command_prefix="!", intents=intents)
 
     init(client)
 
