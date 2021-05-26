@@ -1,11 +1,14 @@
 # created by Sami Bosch on Thursday, 08 November 2018
 
 # This file contains all functions necessary to reply to messages
-import json
-import random
-import time
+import base64
+import codecs
 from datetime import date
+import json
+import logging
+import random
 import socket
+import time
 from urllib.request import urlopen
 from urllib.error import URLError
 
@@ -14,9 +17,8 @@ from discord.ext import commands
 
 from course_handler import create_course, get_courses
 from discord_utils import AsyncTimer, conv_time
+from mylog import logthis
 from tex_handler import *
-import base64
-import codecs
 
 haddock = '../haddock.json'
 dirname = os.path.dirname(__file__)
@@ -381,11 +383,13 @@ def init(client):
 
     @client.event
     async def on_member_join(member):
-        server = member.server
+        logging.info(f"New member join: {member}")
+        server = member.guild
         welcome = server.get_channel(509372274143657984)
-        await welcome.send_message("Bonjour %s et bienvenue dans le serveur SINFO! Indique ton nom et ta section "
-                                   "d'études (p.ex. 'Ingi Bot - sinf') ici pour qu'un modérateur puisse te vérifier "
-                                   "et te donner accès au reste du serveur.\n\nHey there and welcome %s! Please give "
-                                   "your name and the studies you're following (e.g. 'Ingi Bot - sinf') so a "
-                                   "moderator can verify you and give you access to the rest of the server."
-                                   % (member.mention, member.mention))
+        await welcome.send("Bonjour %s et bienvenue dans le serveur SINFO! Indique ton nom et ta section "
+                           "d'études (p.ex. 'Ingi Bot - sinf') ici pour qu'un modérateur puisse te vérifier "
+                           "et te donner accès au reste du serveur.\n\nHey there and welcome %s! Please give "
+                           "your name and the studies you're following (e.g. 'Ingi Bot - sinf') so a "
+                           "moderator can verify you and give you access to the rest of the server."
+                           % (member.mention, member.mention))
+
